@@ -1,0 +1,11 @@
+#product-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  padding: 10px;
+  justify-content: center;
+  align-items: center;
+}
+body {
+  background-color: whitesmoke;
+}
