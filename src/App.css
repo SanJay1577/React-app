@@ -1,8 +1,5 @@
-#product-list {
+#app {
   display: flex;
-  flex-wrap: wrap;
-  gap: 2rem;
-  padding: 10px;
   justify-content: center;
   align-items: center;
 }

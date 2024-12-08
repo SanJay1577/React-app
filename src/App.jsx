@@ -1,141 +1,137 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
-import React, { useEffect, useState } from "react";
-import "./App.css";
+
 import {
-  AppBar,
-  Badge,
   Box,
   Button,
-  Card,
-  CardActionArea,
-  CardActions,
-  CardContent,
-  CardMedia,
-  IconButton,
-  Toolbar,
+  List,
+  ListItem,
+  Paper,
+  TextField,
   Typography,
 } from "@mui/material";
-import { AddShoppingCart } from "@mui/icons-material";
-const url = "https://fakestoreapi.com/products";
-function App() {
-  const [products, setProducts] = useState([]);
-  const [cart, setCart] = useState([]);
-  useEffect(() => {
-    fetch(url, {
-      method: "GET",
-    })
-      .then((res) => res.json())
-      .then((data) => setProducts(data))
-      .catch((err) => {
-        console.log(err);
-      });
-  }, []);
+import "./App.css";
+import TaskProvider, { useTaskContext } from "./context/TaskProvider";
+import { useState } from "react";
 
+function App() {
   return (
     <div id="app">
-      <NavBar cart={cart} />
-      {products && (
-        <div id="product-list">
-          {products?.map((prod, idx) => (
-            <ProductCard
-              products={prod}
-              key={idx}
-              cart={cart}
-              setCart={setCart}
-            />
-          ))}
-        </div>
-      )}
+      <TaskApp />
     </div>
   );
 }
-
 export default App;
+const styleObj = {
+  display: "flex",
+  gap: "1rem",
+  justifyContent: "center",
+  alignItems: "center",
+  width: "80vw",
+  padding: "10px",
+};
 
-//list of products - done
-//add to cart state action (no duplicate)
-//onClick Of cart
-//remove from cart
-//checkout (useSTate, props, useEffect)
-
-function ProductCard({ products, cart, setCart }) {
-  const [showAdd, setShowAdd] = useState(true);
-  function handleAddCart(addProduct) {
-    setCart([...cart, addProduct]);
-    setShowAdd(!showAdd);
-  }
-  function handleRemoveCart(id) {
-    let newCartData = cart.filter((prod) => prod.id != id);
-    setCart(newCartData);
-    setShowAdd(!showAdd);
-  }
+function TaskApp() {
   return (
-    <Card sx={{ maxWidth: 345 }}>
-      <CardActionArea>
-        <CardMedia
-          component="img"
-          height="140"
-          image={products?.image}
-          alt="green iguana"
-        />
-        <CardContent>
-          <Typography gutterBottom variant="h5" component="div">
-            {products?.title}
-          </Typography>
-          <Typography variant="body2" sx={{ color: "text.secondary" }}>
-            {products?.description}
-          </Typography>
-          <Typography>Rs.{products?.price}</Typography>
-          <Typography>Rating : {products?.rating?.rate}</Typography>
-        </CardContent>
-      </CardActionArea>
-      <CardActions>
-        {showAdd ? (
-          <Button
-            onClick={() => handleAddCart(products)}
-            variant="contained"
-            size="small"
-            color="primary"
-          >
-            Add Cart
-          </Button>
-        ) : (
-          <Button
-            onClick={() => handleRemoveCart(products.id)}
-            variant="contained"
-            size="small"
-            color="error"
-          >
-            Remove Cart
-          </Button>
-        )}
-      </CardActions>
-    </Card>
+    <TaskProvider>
+      <Box sx={{ ...styleObj, flexDirection: "column" }}>
+        <AddTask />
+        <ListTask />
+        <TaskStats />
+      </Box>
+    </TaskProvider>
   );
 }
 
-function NavBar({ cart }) {
+function AddTask() {
+  const { dispatch } = useTaskContext();
+  const [taskText, setTaskText] = useState("");
+  console.log("addTask Component rerenderd");
+  const handleAddTask = () => {
+    if (taskText.trim() === "") return;
+    dispatch({ type: "ADD_TASK", payload: taskText });
+    setTaskText("");
+  };
   return (
-    <Box sx={{ flexGrow: 1, marginBottom: "100px" }}>
-      <AppBar position="fixed">
-        <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            ShopCart
-          </Typography>
-          <IconButton
-            size="large"
-            edge="start"
-            color="inherit"
-            aria-label="shooping cart"
-            sx={{ mr: 2 }}
-          >
-            <Badge badgeContent={cart?.length} color="error">
-              <AddShoppingCart />
-            </Badge>
-          </IconButton>
-        </Toolbar>
-      </AppBar>
+    <Box sx={styleObj}>
+      <TextField
+        id="outlined-basic"
+        label="Enter Task"
+        variant="outlined"
+        value={taskText}
+        onChange={(e) => setTaskText(e.target.value)}
+      />
+      <Button variant="contained" onClick={handleAddTask}>
+        Add Task
+      </Button>
     </Box>
+  );
+}
+
+function ListTask() {
+  const { tasks, dispatch } = useTaskContext();
+  console.log("task List component rerenderd");
+  const handleToggle = (id) => {
+    console.log("toggle task function rerenderd");
+
+    dispatch({ type: "TOOGLE_TASK", payload: id });
+  };
+
+  const handleRemove = (id) => {
+    console.log("remove task task function rerenderd");
+    dispatch({ type: "REMOVE_TASK", payload: id });
+  };
+
+  return (
+    <Box sx={styleObj}>
+      <List>
+        <Paper>
+          {tasks?.map((task) => (
+            <ListItem key={task.id} sx={styleObj}>
+              <Typography
+                sx={{
+                  textDecoration: task.completed ? "line-through" : "none",
+                }}
+              >
+                {task.text}
+              </Typography>
+              <Button
+                variant="contained"
+                color="success"
+                onClick={() => handleToggle(task.id)}
+              >
+                {!task.completed ? "Done" : "Redo"}
+              </Button>
+              <Button
+                variant="contained"
+                color="error"
+                onClick={() => handleRemove(task.id)}
+              >
+                Remove
+              </Button>
+            </ListItem>
+          ))}
+        </Paper>
+      </List>
+    </Box>
+  );
+}
+
+function TaskStats() {
+  const { tasks } = useTaskContext();
+  console.log("task stats component rerenderd");
+  const stats = () => {
+    const completedTask = tasks.filter((task) => task.completed == true).length;
+    const totalTask = tasks.length;
+    return { completedTask, totalTask };
+  };
+  return (
+    <Paper>
+      <Box sx={{ ...styleObj, flexDirection: "column" }}>
+        <Typography variant="h4">Task Stats</Typography>
+        <Typography>Completed Task : {stats().completedTask}</Typography>
+        <Typography>Overall Task {stats().totalTask}</Typography>
+      </Box>
+    </Paper>
   );
 }
