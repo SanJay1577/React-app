@@ -3,6 +3,7 @@ import { useTaskContext } from "../../context/TaskProvider";
 import { Button, TextField } from "@mui/material";
 import BaseTaskApp from "./BaseTaskApp";
 import { useNavigate } from "react-router-dom";
+import { addNewTask } from "./taskApiHanders";
 
 function AddTask() {
   const { dispatch } = useTaskContext();
@@ -12,15 +13,22 @@ function AddTask() {
   console.log("addTask Component rerenderd");
 
   const handleAddTask = () => {
-    // if (taskText.trim() === "") return;
     if (inputRef.current?.children[1]?.children[0]?.value === "") return;
-    // dispatch({ type: "ADD_TASK", payload: taskText });
-    dispatch({
-      type: "ADD_TASK",
-      payload: inputRef.current?.children[1]?.children[0]?.value,
-    });
+    addNewTask(inputRef.current?.children[1]?.children[0]?.value)
+      .then((data) => {
+        if (data) {
+          dispatch({
+            type: "ADD_TASK",
+            payload: data,
+          });
+          navigate("/list");
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
     inputRef.current.children[1].children[0].value = "";
-    navigate("/list");
   };
   return (
     <BaseTaskApp>
@@ -32,8 +40,6 @@ function AddTask() {
         variant="outlined"
         multiline
         rows={4}
-        // value={taskText}
-        // onChange={(e) => setTaskText(e.target.value)}
       />
       <Button variant="contained" onClick={handleAddTask}>
         Add Task

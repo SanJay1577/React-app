@@ -3,6 +3,7 @@ import { useTaskContext } from "../../context/TaskProvider";
 import { Box, Button, List, ListItem, Paper, Typography } from "@mui/material";
 import BaseTaskApp from "./BaseTaskApp";
 import { useNavigate } from "react-router-dom";
+import { deleteTask } from "./taskApiHanders";
 
 function ListTask() {
   const styleObj = {
@@ -28,8 +29,13 @@ function ListTask() {
 
   const handleRemove = useCallback(
     (id) => {
-      console.log("remove task task function rerenderd");
-      dispatch({ type: "REMOVE_TASK", payload: id });
+      deleteTask(id)
+        .then((data) => {
+          if (data) {
+            dispatch({ type: "REMOVE_TASK", payload: data.id });
+          }
+        })
+        .catch((err) => console.log(err));
     },
     [dispatch]
   );

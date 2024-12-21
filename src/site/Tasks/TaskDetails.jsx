@@ -4,15 +4,22 @@ import BaseTaskApp from "./BaseTaskApp";
 import { Box, Paper, Typography } from "@mui/material";
 import { useTaskContext } from "../../context/TaskProvider";
 import { useParams } from "react-router-dom";
+import { getTaskById } from "./taskApiHanders";
 
 const TaskDetails = () => {
   const { id } = useParams();
-  const { tasks } = useTaskContext();
   const [task, setTask] = useState({});
   useEffect(() => {
-    const selectedTask = tasks.filter((task) => task.id === parseInt(id));
-    setTask(...selectedTask);
-  }, [id, tasks]);
+    getTaskById(id)
+      .then((data) => {
+        if (data) {
+          setTask(data);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, [id]);
 
   return (
     <BaseTaskApp>
@@ -29,8 +36,8 @@ const TaskDetails = () => {
               alignItems: "center",
             }}
           >
-            <Typography>Created at : {task.id}</Typography>
-            <Typography variant="h4">{task.text}</Typography>
+            <Typography>Created at : {task?.createdTime}</Typography>
+            <Typography variant="h4">{task?.text}</Typography>
             {task.completed ? (
               <Typography color="success">Completed</Typography>
             ) : (
