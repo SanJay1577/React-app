@@ -23,8 +23,10 @@ function TaskStats() {
 
   const stats = () => {
     // console.log("task stats recalculated");
-    const completedTask = tasks.filter((task) => task.completed == true).length;
-    const overallTask = tasks.length;
+    const completedTask = tasks.task.filter(
+      (task) => task.completed == true
+    ).length;
+    const overallTask = tasks.task.length;
     return { completedTask, overallTask };
   };
   return (

@@ -3,7 +3,8 @@ import { useTaskContext } from "../../context/TaskProvider";
 import { Box, Button, List, ListItem, Paper, Typography } from "@mui/material";
 import BaseTaskApp from "./BaseTaskApp";
 import { useNavigate } from "react-router-dom";
-import { deleteTask } from "./taskApiHanders";
+import { deleteTask, editTask } from "./taskApiHanders";
+import TaskSearchBar from "./TaskSearchBar";
 
 function ListTask() {
   const styleObj = {
@@ -16,15 +17,22 @@ function ListTask() {
     margin: "10px",
   };
   const { tasks, dispatch } = useTaskContext();
+
   const navigate = useNavigate();
-  console.log("task List component rerenderd");
 
   const handleToggle = useCallback(
     (id) => {
-      console.log("toggle task function rerenderd");
-      dispatch({ type: "TOOGLE_TASK", payload: id });
+      let toggledData = tasks.task.find((task) => task.id == id);
+      let payload = { ...toggledData, completed: !toggledData.completed };
+      editTask({ id, payload })
+        .then((data) => {
+          if (data) {
+            dispatch({ type: "TOOGLE_TASK", payload: data });
+          }
+        })
+        .catch((err) => console.log(err));
     },
-    [dispatch]
+    [dispatch, tasks]
   );
 
   const handleRemove = useCallback(
@@ -42,10 +50,11 @@ function ListTask() {
 
   return (
     <BaseTaskApp>
+      <TaskSearchBar />
       <List>
-        <Paper>
-          {tasks?.map((task) => (
-            <ListItem key={task.id} sx={styleObj}>
+        {tasks?.task?.map((task) => (
+          <ListItem key={task.id}>
+            <Paper sx={{ ...styleObj }}>
               <Typography
                 sx={{
                   textDecoration: task.completed ? "line-through" : "none",
@@ -76,9 +85,9 @@ function ListTask() {
                   Remove
                 </Button>
               </Box>
-            </ListItem>
-          ))}
-        </Paper>
+            </Paper>
+          </ListItem>
+        ))}
       </List>
     </BaseTaskApp>
   );
