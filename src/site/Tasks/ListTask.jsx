@@ -52,7 +52,7 @@ function ListTask() {
     <BaseTaskApp>
       <TaskSearchBar />
       <List>
-        {tasks?.task?.map((task) => (
+        {tasks?.task?.slice(0, 5).map((task) => (
           <ListItem key={task.id}>
             <Paper sx={{ ...styleObj }}>
               <Typography
