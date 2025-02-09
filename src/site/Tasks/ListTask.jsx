@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { useTaskContext } from "../../context/TaskProvider";
 import { Box, Button, List, ListItem, Paper, Typography } from "@mui/material";
 import BaseTaskApp from "./BaseTaskApp";
@@ -7,6 +7,12 @@ import { deleteTask, editTask } from "./taskApiHanders";
 import TaskSearchBar from "./TaskSearchBar";
 
 function ListTask() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (!localStorage.getItem("accesToken")) {
+      navigate("/", { replace: true });
+    }
+  }, []);
   const styleObj = {
     display: "flex",
     gap: "1rem",
@@ -18,11 +24,9 @@ function ListTask() {
   };
   const { tasks, dispatch } = useTaskContext();
 
-  const navigate = useNavigate();
-
   const handleToggle = useCallback(
     (id) => {
-      let toggledData = tasks.task.find((task) => task.id == id);
+      let toggledData = tasks.task.find((task) => task._id == id);
       let payload = { ...toggledData, completed: !toggledData.completed };
       editTask({ id, payload })
         .then((data) => {

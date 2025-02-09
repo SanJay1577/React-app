@@ -17,7 +17,7 @@ const TaskContext = createContext();
 const taskReducer = (state, action) => {
   switch (action.type) {
     case "FETCH_ALL_TASK":
-      return { ...state, task: action.payload };
+      return { ...state, task: action.payload.data };
     case "ADD_TASK":
       return { ...state, task: [...state.task, action.payload] };
     case "TOOGLE_TASK":

@@ -6,6 +6,7 @@ import TaskStats from "./TaskStats";
 import AddTask from "./AddTask";
 import TaskHome from "./TaskHome";
 import TaskDetails from "./TaskDetails";
+import LoginPage from "./LoginPage";
 
 function TaskApp() {
   return (
@@ -16,6 +17,7 @@ function TaskApp() {
         <Route path="/add" element={<AddTask />} />
         <Route path="/stats" element={<TaskStats />} />
         <Route path="/task/:id" element={<TaskDetails />} />
+        <Route path="/login" element={<LoginPage />} />
         <Route path="*" element={<h1>No page</h1>} />
       </Routes>
     </TaskProvider>
